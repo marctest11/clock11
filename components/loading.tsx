@@ -22,7 +22,13 @@ export default function Load() {
     <div>
       {loading ? (
         <Skeleton active />
-      ) : ()}
+      ) : (
+        // Your JSX code for the non-loading state goes here
+        // For example, you can render another component or HTML elements
+        <div>
+          <p>Content loaded successfully</p>
+        </div>
+      )}
     </div>
   );
 }

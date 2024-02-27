@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Webcam from "react-webcam";
+import Image from "next/image";
 
 export default function CamareUesr() {
   const webcamRef = useRef<any>(null);
@@ -16,15 +17,23 @@ export default function CamareUesr() {
   return (
     <div>
       {capturedImage ? (
-        <img src={capturedImage} alt="Captured" style={{ maxWidth: "100%" }} />
+        <div className="relative w-full max-w-[500px] h-auto">
+          <Image
+            src={capturedImage}
+            alt="Captured"
+            layout="responsive"
+            width={500}
+            height={300}
+          />
+        </div>
       ) : (
         <Webcam
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          width={640}
-          height={480}
-          style={{ maxWidth: "100%" }}
+          width={500}
+          height={300}
+          className="flex justify-center"
         />
       )}
       <button onClick={capture}> Photoshoot!</button>
