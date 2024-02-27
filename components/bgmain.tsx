@@ -1,13 +1,16 @@
 "use client";
-import React from "react";
+import React, { ReactNode } from "react";
 import { Layout, theme } from "antd";
 
-export default function BgMain({ children }) {
+interface MaindashProps {
+  children: ReactNode;
+}
+
+export default function BgMain({ children }: MaindashProps) {
   const { Content } = Layout;
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  //123
 
   return (
     <Layout>
@@ -20,7 +23,6 @@ export default function BgMain({ children }) {
             borderRadius: borderRadiusLG,
           }}
         >
-
           {children}
         </div>
       </Content>
