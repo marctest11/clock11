@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { Col, Row, Card, Button, Form, Input,Skeleton } from "antd";
+import { Col, Row, Card, Button, Form, Input, Skeleton } from "antd";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -11,7 +11,6 @@ import {
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Webcam from "react-webcam";
-
 
 export default function Home() {
   const webcamRef = useRef<any>(null);
@@ -59,7 +58,6 @@ export default function Home() {
           //const latitude = 13.8957764;
           //const longitude = 100.671762;
 
-
           const Datapush = {
             head: hea,
             code: cod,
@@ -95,121 +93,133 @@ export default function Home() {
       console.error("Error catch login:", error);
     }
   };
+  const loadsim = async () => {
+    const delay = () => new Promise((resolve) => setTimeout(resolve, 1000));
+    await delay();
+    setLoading(false);
+  };
+  useEffect(() => {
+    loadsim();
+  }, []);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4">
-      <div className="flex justify-center">
-        <Col xs={24} sm={24} md={24} lg={24} xl={12} className="mb-2">
-          <Card bordered={true} className="drop-shadow-md">
-            <Form
-              form={form}
-              layout="vertical"
-              style={{ maxWidth: "100%" }}
-              initialValues={{ status: false }}
-              autoComplete="off"
-              labelCol={{ span: 4 }}
-            >
-              <Form.Item
-                label="Username :"
-                name="user"
-                rules={[
-                  { required: true, message: "Please input your username!" },
-                ]}
+      {loading ? (
+        <Skeleton active /> // Render loading state while data is being fetched
+      ) : (
+        <div className="flex justify-center">
+          <Col xs={24} sm={24} md={24} lg={24} xl={12} className="mb-2">
+            <Card bordered={true} className="drop-shadow-md">
+              <Form
+                form={form}
+                layout="vertical"
+                style={{ maxWidth: "100%" }}
+                initialValues={{ status: false }}
+                autoComplete="off"
+                labelCol={{ span: 4 }}
               >
-                <Input name="user" />
-              </Form.Item>
-              <Form.Item
-                label="Password :"
-                name="pass"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
-              >
-                <Input.Password name="pass" />
-              </Form.Item>
+                <Form.Item
+                  label="Username :"
+                  name="user"
+                  rules={[
+                    { required: true, message: "Please input your username!" },
+                  ]}
+                >
+                  <Input name="user" />
+                </Form.Item>
+                <Form.Item
+                  label="Password :"
+                  name="pass"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                  ]}
+                >
+                  <Input.Password name="pass" />
+                </Form.Item>
 
-              <Form.Item label="PhotoShoot!! :">
-                {!showWebcam ? (
-                  <div className="flex justify-items-center">
-                    <Button
-                      block
-                      size="large"
-                      icon={<CameraOutlined />}
-                      onClick={() => setShowWebcam(true)}
-                    ></Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Card bordered={true} className="drop-shadow-md">
-                      {capturedImage ? (
-                        <div className="relative w-full max-w-[500px] h-auto">
-                          <Image
-                            src={capturedImage}
-                            alt="Captured"
-                            layout="responsive"
+                <Form.Item label="PhotoShoot!! :">
+                  {!showWebcam ? (
+                    <div className="flex justify-items-center">
+                      <Button
+                        block
+                        size="large"
+                        icon={<CameraOutlined />}
+                        onClick={() => setShowWebcam(true)}
+                      ></Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Card bordered={true} className="drop-shadow-md">
+                        {capturedImage ? (
+                          <div className="relative w-full max-w-[500px] h-auto">
+                            <Image
+                              src={capturedImage}
+                              alt="Captured"
+                              layout="responsive"
+                              width={500}
+                              height={300}
+                            />
+                          </div>
+                        ) : (
+                          <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
                             width={500}
                             height={300}
+                            className="flex justify-center"
                           />
+                        )}
+                        <div className=" flex justify-center">
+                          <Button
+                            shape="round"
+                            icon={<CheckOutlined />}
+                            className="ml-2"
+                            onClick={capture}
+                          >
+                            Shoots!!
+                          </Button>
+
+                          <Button
+                            type="primary"
+                            danger
+                            icon={<CloseOutlined />}
+                            shape="round"
+                            className="ml-2"
+                            onClick={closeWebcam}
+                          >
+                            Close Webcam
+                          </Button>
                         </div>
-                      ) : (
-                        <Webcam
-                          audio={false}
-                          ref={webcamRef}
-                          screenshotFormat="image/jpeg"
-                          width={500}
-                          height={300}
-                          className="flex justify-center"
-                        />
-                      )}
-                      <div className=" flex justify-center">
-                        <Button
-                          shape="round"
-                          icon={<CheckOutlined />}
-                          className="ml-2"
-                          onClick={capture}
-                        >
-                          Shoots!!
-                        </Button>
+                      </Card>
+                    </div>
+                  )}
+                </Form.Item>
 
-                        <Button
-                          type="primary"
-                          danger
-                          icon={<CloseOutlined />}
-                          shape="round"
-                          className="ml-2"
-                          onClick={closeWebcam}
-                        >
-                          Close Webcam
-                        </Button>
-                      </div>
-                    </Card>
+                <Form.Item>
+                  <div className=" flex justify-center">
+                    <Button
+                      shape="round"
+                      icon={<CheckOutlined />}
+                      className="ml-2"
+                      onClick={handleOk}
+                    >
+                      Save
+                    </Button>
+
+                    <Button
+                      type="primary"
+                      danger
+                      icon={<CloseOutlined />}
+                      shape="circle"
+                      className="ml-2"
+                    ></Button>
                   </div>
-                )}
-              </Form.Item>
-
-              <Form.Item>
-                <div className=" flex justify-center">
-                  <Button
-                    shape="round"
-                    icon={<CheckOutlined />}
-                    className="ml-2"
-                    onClick={handleOk}
-                  >
-                    Save
-                  </Button>
-
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<CloseOutlined />}
-                    shape="circle"
-                    className="ml-2"
-                  ></Button>
-                </div>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-      </div>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </div>
+      )}
     </div>
   );
 }
