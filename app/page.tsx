@@ -83,16 +83,30 @@ export default function Home() {
           } else {
             console.error("ErrorStatus", response.status);
           }
+
+          const timewait = async () => {
+            const delay = (ms: number | undefined) =>
+              new Promise((resolve) => setTimeout(resolve, ms));
+            await delay(0);
+
+            router.push("/loading");
+            setLoading(false);
+          };
+          timewait();
         });
       } else {
+        setLoading(false);
         console.error("Geolocation is not supported by this browser.");
       }
-      setLoading(false);
-      router.push("/report");
+
+      //setLoading(false);
+      //router.push("/report");
     } catch (error) {
+      setLoading(false);
       console.error("Error catch login:", error);
     }
   };
+
   const loadsim = async () => {
     const delay = () => new Promise((resolve) => setTimeout(resolve, 1000));
     await delay();

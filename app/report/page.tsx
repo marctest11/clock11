@@ -130,13 +130,47 @@ export default function Report() {
   };
 
   useEffect(() => {
-    ErroDate();
+    const fetchData = async () => {
+      try {
+        await ErroDate();
+        // ต่อมาทำตามต้องการ
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const hanldeback = () => {
     router.push("/");
   };
 
+  const errbackhm = async () => {
+    setLoading(true);
+    const delay = (hour: number) =>
+      new Promise((resolve) => setTimeout(resolve, hour * 60 * 60 * 1000));
+    await delay(2);
+    router.push("/");
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    errbackhm();
+  }, [setErrorData]);
+
+  const succbackhm = async () => {
+    setLoading(true);
+    const delay = (hour: number) =>
+      new Promise((resolve) => setTimeout(resolve, hour * 60 * 60 * 1000));
+    await delay(1);
+    router.push("/");
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    succbackhm();
+  }, [setSuccessData]);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4">
       {loading ? (
@@ -202,7 +236,7 @@ const SuccessResult = ({
           {successData.name && (
             <Text
               key="1"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pb-2"
             >
               ชื่อ-สกุล :
             </Text>
@@ -252,7 +286,7 @@ const SuccessResult = ({
           {successData.name && (
             <Text
               key="data1"
-              className="text text-base  font-base sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pl-2"
+              className="text text-base font-base sm:text-sm md:text-lg lg:text-lg xl:text-lg pl-2 pb-4"
             >
               {successData.name}
             </Text>
@@ -261,7 +295,7 @@ const SuccessResult = ({
           {successData.inTime && (
             <Text
               key="data2"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pb-2"
             >
               {successData.inTime}
             </Text>
@@ -269,7 +303,7 @@ const SuccessResult = ({
           {successData.outTime && (
             <Text
               key="data3"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
             >
               {successData.outTime}
             </Text>
@@ -277,7 +311,7 @@ const SuccessResult = ({
           {successData.late && (
             <Text
               key="data4"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
             >
               {successData.late}
             </Text>
@@ -285,7 +319,7 @@ const SuccessResult = ({
           {successData.lateTime && (
             <Text
               key="data5"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
             >
               {successData.lateTime}
             </Text>
@@ -293,7 +327,7 @@ const SuccessResult = ({
           {successData.lateall && (
             <Text
               key="data6"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
+              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
             >
               {successData.lateall}
             </Text>
