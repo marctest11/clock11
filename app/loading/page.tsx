@@ -14,7 +14,7 @@ export default function Loading() {
     setSpinning(true);
     const delay = (ms: number | undefined) =>
       new Promise((resolve) => setTimeout(resolve, ms));
-    await delay(2000);
+    await delay(1500);
     router.push("/report");
     setSpinning(false);
   };

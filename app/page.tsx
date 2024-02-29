@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { Col, Row, Card, Button, Form, Input, Skeleton } from "antd";
+import { Col, Tooltip, Card, Button, Form, Input, Skeleton } from "antd";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -44,6 +44,10 @@ export default function Home() {
       setImgb64(base64Data);
     }
   }, [webcamRef]);
+
+  const handleclear = async () => {
+    form.resetFields();
+  };
 
   const handleOk = async () => {
     try {
@@ -87,7 +91,7 @@ export default function Home() {
           const timewait = async () => {
             const delay = (ms: number | undefined) =>
               new Promise((resolve) => setTimeout(resolve, ms));
-            await delay(0);
+            await delay(500);
 
             router.push("/loading");
             setLoading(false);
@@ -108,13 +112,15 @@ export default function Home() {
   };
 
   const loadsim = async () => {
-    const delay = () => new Promise((resolve) => setTimeout(resolve, 1000));
-    await delay();
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    await delay(1000);
     setLoading(false);
   };
   useEffect(() => {
     loadsim();
   }, []);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4">
       {loading ? (
@@ -219,14 +225,16 @@ export default function Home() {
                     >
                       Save
                     </Button>
-
-                    <Button
-                      type="primary"
-                      danger
-                      icon={<CloseOutlined />}
-                      shape="circle"
-                      className="ml-2"
-                    ></Button>
+                    <Tooltip title="Clear">
+                      <Button
+                        type="primary"
+                        danger
+                        icon={<CloseOutlined />}
+                        shape="circle"
+                        className="ml-2"
+                        onClick={handleclear}
+                      ></Button>
+                    </Tooltip>
                   </div>
                 </Form.Item>
               </Form>

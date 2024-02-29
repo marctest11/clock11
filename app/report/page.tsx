@@ -49,19 +49,38 @@ export default function Report() {
     km: string;
     rem: string;
   } | null>(null);
+  const [datano, setDatano] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
 
   const ErroDate = async () => {
     try {
-      const res = await fetch("/api/login");
-      //const res = await axios.get("/api/login");
-      const data = await res.text();
       setLoading(true);
+      const res = await fetch("/api/login");
+
+      if (!res.ok) {
+        console.error(`Fetch failed with status: ${res.status}`);
+        setLoading(false);
+        return;
+      }
+
+      const data = await res.text();
       const Datatrim = data.trim();
+
       console.log("dataRe:", data);
       console.log("dataTrim:", Datatrim);
+
+      if (Datatrim === null || Datatrim.trim() === "") {
+        console.log("Data is null or empty");
+        setLoading(false);
+
+        setTimeout(() => {
+          router.push("/");
+        }, 5000);
+
+        return;
+      }
 
       let jsonData;
       let jsonSuccess;
@@ -110,6 +129,7 @@ export default function Report() {
         console.log("success:", jsonSuccess);
         setSuccessData(jsonSuccess);
         setLoading(false);
+        //CASE 4 DATA NULL
       } else {
         console.error("Unknow response format :", Datatrim);
         setLoading(false);
@@ -130,16 +150,7 @@ export default function Report() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await ErroDate();
-        // ต่อมาทำตามต้องการ
-      } catch (error) {
-        console.error("Error in fetchData:", error);
-      }
-    };
-
-    fetchData();
+    ErroDate();
   }, []);
 
   const hanldeback = () => {
@@ -148,15 +159,19 @@ export default function Report() {
 
   const errbackhm = async () => {
     setLoading(true);
-    const delay = (hour: number) =>
+    const delayerr = (hour: number) =>
       new Promise((resolve) => setTimeout(resolve, hour * 60 * 60 * 1000));
-    await delay(2);
+    await delayerr(2);
+
+    console.log("errbackhm");
+
     router.push("/");
     setLoading(false);
   };
 
   useEffect(() => {
     errbackhm();
+    console.log("errbackhm");
   }, [setErrorData]);
 
   const succbackhm = async () => {
@@ -171,6 +186,7 @@ export default function Report() {
   useEffect(() => {
     succbackhm();
   }, [setSuccessData]);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 gap-4">
       {loading ? (
@@ -183,10 +199,25 @@ export default function Report() {
             <SuccessResult successData={successData} onLogin={hanldeback} />
           ) : (
             <div>
-              Unexpected state. Please check your code.
-              <Button type="primary" danger key="console" onClick={hanldeback}>
-                Login
-              </Button>
+              <Result
+                status="warning"
+                title="Session Timeout !!!"
+                subTitle={
+                  <Text className="text-sm">
+                    กำลังพาท่านกลับสู่หน้าแรก.....
+                  </Text>
+                }
+                extra={
+                  <Button
+                    type="primary"
+                    danger
+                    key="console"
+                    onClick={hanldeback}
+                  >
+                    Login
+                  </Button>
+                }
+              />
             </div>
           )}
         </>
@@ -230,108 +261,117 @@ const SuccessResult = ({
     extra={[
       <div
         key="responsive"
-        className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 "
+        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1"
       >
-        <div className="grid justify-end pr-4">
-          {successData.name && (
-            <Text
-              key="1"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pb-2"
-            >
-              ชื่อ-สกุล :
-            </Text>
-          )}
-          {successData.inTime && (
-            <Text
-              key="2"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
-            >
-              เวลาเข้า :
-            </Text>
-          )}
-          {successData.outTime && (
-            <Text
-              key="3"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
-            >
-              เวลาออก :
-            </Text>
-          )}
-          {successData.late && (
-            <Text
-              key="4"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
-            >
-              เวลาสาย(วันนี้) :
-            </Text>
-          )}
-          {successData.lateTime && (
-            <Text
-              key="5"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
-            >
-              สายสะสม(ครั้ง) :
-            </Text>
-          )}
-          {successData.lateall && (
-            <Text
-              key="6"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pt-2"
-            >
-              สายสะสม(เวลารวม) :
-            </Text>
-          )}
-        </div>
-        <div className="grid justify-start">
-          {successData.name && (
-            <Text
-              key="data1"
-              className="text text-base font-base sm:text-sm md:text-lg lg:text-lg xl:text-lg pl-2 pb-4"
-            >
-              {successData.name}
-            </Text>
-          )}
-
-          {successData.inTime && (
-            <Text
-              key="data2"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pb-2"
-            >
-              {successData.inTime}
-            </Text>
-          )}
-          {successData.outTime && (
-            <Text
-              key="data3"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-            >
-              {successData.outTime}
-            </Text>
-          )}
-          {successData.late && (
-            <Text
-              key="data4"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-            >
-              {successData.late}
-            </Text>
-          )}
-          {successData.lateTime && (
-            <Text
-              key="data5"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-            >
-              {successData.lateTime}
-            </Text>
-          )}
-          {successData.lateall && (
-            <Text
-              key="data6"
-              className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-            >
-              {successData.lateall}
-            </Text>
-          )}
+        <div className="grid justify-center">
+          <div className="grid grid-cols-2 justify-evenly ">
+            {successData.name && (
+              <>
+                <Text
+                  key="1"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mb-1"
+                >
+                  ชื่อ-สกุล :
+                </Text>
+                <Text
+                  key="data1"
+                  className="grid grid-col-span-1 text text-base font-base sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mb-1 "
+                >
+                  {successData.name}
+                </Text>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 justify-evenly">
+            {successData.inTime && (
+              <>
+                <Text
+                  key="2"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-1 mt-1 "
+                >
+                  เวลาเข้า :
+                </Text>
+                <Text
+                  key="data2"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mt-1"
+                >
+                  {successData.inTime}
+                </Text>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 justify-evenly">
+            {successData.outTime && (
+              <>
+                <Text
+                  key="3"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-1 mt-1"
+                >
+                  เวลาออก :
+                </Text>
+                <Text
+                  key="data3"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mt-1"
+                >
+                  {successData.outTime}
+                </Text>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 justify-evenly">
+            {successData.late && (
+              <>
+                <Text
+                  key="4"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mt-1 "
+                >
+                  เวลาสาย(วันนี้) :
+                </Text>
+                <Text
+                  key="data4"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mt-1"
+                >
+                  {successData.late}
+                </Text>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 justify-evenly">
+            {successData.lateTime && (
+              <>
+                <Text
+                  key="5"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mt-1"
+                >
+                  สายสะสม(ครั้ง) :
+                </Text>
+                <Text
+                  key="data5"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mt-1"
+                >
+                  {successData.lateTime}
+                </Text>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 justify-evenly">
+            {successData.lateall && (
+              <>
+                <Text
+                  key="6"
+                  className="grid grid-col-span-1 text text-sm font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mt-1"
+                >
+                  สายสะสม(เวลารวม) :
+                </Text>
+                <Text
+                  key="data6"
+                  className="grid grid-col-span-1 text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mt-1"
+                >
+                  {successData.lateall}
+                </Text>
+              </>
+            )}
+          </div>
         </div>
       </div>,
       <div className="mb-4" key="space"></div>,
