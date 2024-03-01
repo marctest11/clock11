@@ -25,12 +25,6 @@ export default function Home() {
   };
 
   const [form] = Form.useForm();
-  const apikeyR = "0d1d06b7-d854-43ce-8f69-c87eab423b1a";
-  //const apikeyT = "d631bb34-48b4-45f1-a8a6-7193ea3dd8a0";
-
-  const hea = "S11E";
-  const fot = "EN00";
-  const cod = "E0000";
 
   const capture = useCallback(() => {
     const imgSrc = webcamRef.current.getScreenshot();
@@ -49,10 +43,32 @@ export default function Home() {
     form.resetFields();
   };
 
+  const enction = (apikeyR: string | undefined) => {
+    const crypto = require("crypto");
+
+    const key = crypto.randomBytes(32);
+    const iv = crypto.randomBytes(16);
+
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+
+    let enc = cipher.update(apikeyR, "utf-8", "hex");
+    enc += cipher.final("hex");
+
+    console.log("Encrypted Data:", enc);
+    console.log("Initialization Vector (IV):", iv.toString("hex"));
+    console.log("Encryption Key:", key.toString("hex"));
+
+    return { enc, iv, key };
+  };
+
   const handleOk = async () => {
     try {
       setLoading(true);
       const Dataform = form.getFieldsValue();
+      const apikeyR = process.env.NEXT_PUBLIC_API_KEY;
+      const hea = process.env.NEXT_PUBLIC_HEA;
+      const cod = process.env.NEXT_PUBLIC_COD;
+      const fot = process.env.NEXT_PUBLIC_FOT;
 
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(async (position) => {
@@ -62,6 +78,8 @@ export default function Home() {
           //const latitude = 13.8957764;
           //const longitude = 100.671762;
 
+          const { enc, iv, key } = enction(apikeyR);
+
           const Datapush = {
             head: hea,
             code: cod,
@@ -69,7 +87,9 @@ export default function Home() {
             lati: latitude,
             long: longitude,
             footer: fot,
-            ak: apikeyR,
+            ak: enc,
+            iv: iv,
+            key: key,
             //b64: imgb64,
           };
 

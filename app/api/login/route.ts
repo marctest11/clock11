@@ -11,16 +11,30 @@ export function GET() {
   });
 }
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   try {
-    const { head, code, ak, Data, footer, lati, long } = await req.json();
+    const crypto = require("crypto");
+    const { head, code, ak, Data, footer, lati, long, iv, key } =
+      await req.json();
+
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      Buffer.from(key),
+      Buffer.from(iv, "hex")
+    );
+
+    let decr = decipher.update(ak, "hex", "utf-8");
+    decr += decipher.final("utf-8");
+
+    console.log("Decrypted Data:", decr);
+
     const responseData = {
       data: {
         head,
         footer,
         Data,
         code,
-        ak,
+        decr,
       },
     };
     const jsonData = JSON.stringify(Data);
@@ -30,7 +44,7 @@ export async function POST(req: Request, res: Response) {
     const id = splitdata.user;
     const pass = splitdata.pass;
 
-    const format = `${head};${code};K${ak};U${id};P${pass};${footer}`;
+    const format = `${head};${code};K${decr};U${id};P${pass};${footer}`;
     console.log("ApData", responseData);
     console.log("fomat:", format);
 
@@ -39,13 +53,13 @@ export async function POST(req: Request, res: Response) {
     console.log("ResponTest:", resp.data, resp.status);
 
     if (resp.data.includes("Ok")) {
-      const codetime = "E0002";
+      const codetime = process.env.NEXT_PUBLIC_TIME;
 
       const datares = {
         datatimein: {
           head,
           codetime,
-          ak,
+          decr,
           id,
           pass,
           footer,
@@ -55,7 +69,7 @@ export async function POST(req: Request, res: Response) {
         },
       };
 
-      const timepush = `${head};${codetime};K${ak};U${id};P${pass};LA${lati};LO${long};${footer}`;
+      const timepush = `${head};${codetime};K${decr};U${id};P${pass};LA${lati};LO${long};${footer}`;
       console.log("DataTimepush", datares);
       console.log("timepush:", timepush);
 
@@ -90,11 +104,4 @@ export async function POST(req: Request, res: Response) {
     console.error("Error processing request:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
-function retrieveStoredData() {
-  throw new Error("Function not implemented.");
-}
-
-function storeData(chkid: string) {
-  throw new Error("Function not implemented.");
 }
