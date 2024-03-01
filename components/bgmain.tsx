@@ -17,7 +17,7 @@ export default function BgMain({ children }: MaindashProps) {
       <Content style={{ margin: "10px 16px 0" }}>
         <div
           style={{
-            padding: 24,
+            padding: 14,
             minHeight: 887,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,

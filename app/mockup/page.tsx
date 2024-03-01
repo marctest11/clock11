@@ -8,6 +8,49 @@ import axios from "axios";
 const { Paragraph, Text, Title } = Typography;
 
 export default function Mockup() {
+  const hanldeback = () => {
+    const apikeyT = process.env.NEXT_PUBLIC_API_KEY;
+    const hea = process.env.NEXT_PUBLIC_HEA;
+    const cod = process.env.NEXT_PUBLIC_COD;
+    const fot = process.env.NEXT_PUBLIC_FOT;
+    const time = process.env.NEXT_PUBLIC_TIME;
+
+    console.log("a", apikeyT, "b", hea, "c", cod, "d", fot, "e", time);
+
+    encrypt(apikeyT);
+  };
+
+  const encrypt = (apikeyT: string | undefined) => {
+    const crypto = require("crypto");
+
+    // สร้างคีย์และ IV เหมือนกับตอน encrypt
+    const key = crypto.randomBytes(32);
+    const iv = crypto.randomBytes(16);
+
+    // สร้าง Cipher Object ด้วย algorithm 'aes-256-cbc'
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+
+    // ทำการ encrypt ข้อมูล
+    let encryptedData = cipher.update(apikeyT, "utf-8", "hex");
+    encryptedData += cipher.final("hex");
+
+    console.log("Encrypted Data:", encryptedData);
+    console.log("Initialization Vector (IV):", iv.toString("hex"));
+    console.log("Encryption Key:", key.toString("hex"));
+
+    // ตอน decrypt ให้ใช้ IV และ key เดียวกัน
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      Buffer.from(key),
+      Buffer.from(iv, "hex")
+    );
+
+    // ทำการ decrypt ข้อมูล
+    let decryptedData = decipher.update(encryptedData, "hex", "utf-8");
+    decryptedData += decipher.final("utf-8");
+
+    console.log("Decrypted Data:", decryptedData);
+  };
   return (
     <div
       key="responsive1"
@@ -22,20 +65,20 @@ export default function Mockup() {
             key="responsive"
             className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1"
           >
-            <div className="grid justify-center ">
-              <div className="grid grid-cols-2 justify-evenly ">
+            <div className="grid justify-start">
+              <div className="grid grid-cols-3 justify-evenly">
                 <>
                   <Text
                     key="1"
-                    className="grid grid-col-span-1  text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mb-1 "
+                    className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg ml-2 mb-1 "
                   >
                     ชื่อ-สกุล :
                   </Text>
                   <Text
                     key="data1"
-                    className="grid grid-col-span-1 text text-base font-base sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mb-1 "
+                    className="col-span-2 text text-base font-base sm:text-base md:text-lg lg:text-lg xl:text-lg ml-0 mb-1 "
                   >
-                    คุณราเมศร์ เฉลยกุล
+                    คุณนฤสรณ์ วัฒนพิพัฒน์
                   </Text>
                 </>
               </div>
@@ -112,49 +155,11 @@ export default function Mockup() {
                 </Text>
               </div>
             </div>
-            {/*
-            <div className="grid justify-start">
-              <Text
-                key="data1"
-                className="text text-base font-base sm:text-sm md:text-lg lg:text-lg xl:text-lg pl-2 pb-4"
-              >
-                คุณราเมศร์ เฉลยกุล
-              </Text>
-              <Text
-                key="data2"
-                className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2 pb-2"
-              >
-                08:27
-              </Text>
-              <Text
-                key="data3"
-                className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-              >
-                17:30
-              </Text>
-              <Text
-                key="data4"
-                className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-              >
-                17:30
-              </Text>
-              <Text
-                key="data5"
-                className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-              >
-                17:30
-              </Text>
-              <Text
-                key="data6"
-                className="text text-base font-semibold sm:text-base md:text-lg lg:text-lg xl:text-lg pl-2"
-              >
-                17:30
-              </Text>
-            </div>
-        */}
           </div>,
 
-          <Button key="buy">Buy Again</Button>,
+          <Button key="buy" onClick={hanldeback}>
+            EnDe
+          </Button>,
         ]}
       />
     </div>
