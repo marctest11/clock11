@@ -26,8 +26,6 @@ export async function POST(req: Request) {
     let decr = decipher.update(ak, "hex", "utf-8");
     decr += decipher.final("utf-8");
 
-    console.log("Decrypted Data:", decr);
-
     const responseData = {
       data: {
         head,
@@ -45,8 +43,6 @@ export async function POST(req: Request) {
     const pass = splitdata.pass;
 
     const format = `${head};${code};K${decr};U${id};P${pass};${footer}`;
-    console.log("ApData", responseData);
-    console.log("fomat:", format);
 
     const resp = await axios.post("https://as001.s11.group:10101", format);
 
@@ -70,8 +66,6 @@ export async function POST(req: Request) {
       };
 
       const timepush = `${head};${codetime};K${decr};U${id};P${pass};LA${lati};LO${long};${footer}`;
-      console.log("DataTimepush", datares);
-      console.log("timepush:", timepush);
 
       const responsetime = await axios.post(
         "https://as001.s11.group:10101",

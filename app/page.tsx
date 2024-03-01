@@ -54,10 +54,6 @@ export default function Home() {
     let enc = cipher.update(apikeyR, "utf-8", "hex");
     enc += cipher.final("hex");
 
-    console.log("Encrypted Data:", enc);
-    console.log("Initialization Vector (IV):", iv.toString("hex"));
-    console.log("Encryption Key:", key.toString("hex"));
-
     return { enc, iv, key };
   };
 
@@ -75,9 +71,6 @@ export default function Home() {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
 
-          //const latitude = 13.8957764;
-          //const longitude = 100.671762;
-
           const { enc, iv, key } = enction(apikeyR);
 
           const Datapush = {
@@ -93,17 +86,10 @@ export default function Home() {
             //b64: imgb64,
           };
 
-          console.log("DataP:", Datapush);
-
           const response = await axios.post("/api/login", Datapush);
 
           if (response.status === 200) {
-            console.log(
-              "PostOK:",
-              response.data,
-              response.status,
-              response.statusText
-            );
+            console.log("PostOK:", response.status, response.statusText);
           } else {
             console.error("ErrorStatus", response.status);
           }
@@ -122,9 +108,6 @@ export default function Home() {
         setLoading(false);
         console.error("Geolocation is not supported by this browser.");
       }
-
-      //setLoading(false);
-      //router.push("/report");
     } catch (error) {
       setLoading(false);
       console.error("Error catch login:", error);
