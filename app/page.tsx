@@ -68,17 +68,93 @@ export default function Home() {
 
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(async (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
+          // const latitude = position.coords.latitude;
+          // const longitude = position.coords.longitude;
 
+          const latitude = 13.895776472608368;
+          const longitude = 100.67166237824289;
+
+          function getRandomCoordinate(
+            lat: any,
+            long: any,
+            maxDistance: number,
+            minDistance: number
+          ) {
+            const earthRadius = 6371e3;
+
+            function toRadians(degrees: number) {
+              return (degrees * Math.PI) / 180;
+            }
+
+            function toDegrees(radians: number) {
+              return (radians * 180) / Math.PI;
+            }
+
+            function getRandomDistance() {
+              let distance;
+              do {
+                distance = Math.random() * maxDistance;
+              } while (distance < minDistance);
+              return distance;
+            }
+
+            function getRandomDirection() {
+              return Math.random() * 2 * Math.PI;
+            }
+
+            const distance = getRandomDistance();
+            const direction = getRandomDirection();
+
+            const newLat = Math.asin(
+              Math.sin(toRadians(lat)) * Math.cos(distance / earthRadius) +
+                Math.cos(toRadians(lat)) *
+                  Math.sin(distance / earthRadius) *
+                  Math.cos(direction)
+            );
+            const newLong =
+              toRadians(long) +
+              Math.atan2(
+                Math.sin(direction) *
+                  Math.sin(distance / earthRadius) *
+                  Math.cos(toRadians(lat)),
+                Math.cos(distance / earthRadius) -
+                  Math.sin(toRadians(lat)) * Math.sin(newLat)
+              );
+
+            console.log(
+              `Original Coordinate: Latitude: ${lat}, Longitude: ${long}`
+            );
+            console.log(`Random Distance: ${distance} meters`);
+            console.log(
+              `New Coordinate: Latitude: ${toDegrees(
+                newLat
+              )}, Longitude: ${toDegrees(newLong)}`
+            );
+
+            return {
+              latitude: toDegrees(newLat),
+              longitude: toDegrees(newLong),
+            };
+          }
+
+          const maxDistance = 50; // ระยะสูงสุด (เมตร)
+          const minDistance = 30; // ระยะต่ำสุด (เมตร)
+          const randomCoordinate = getRandomCoordinate(
+            latitude,
+            longitude,
+            maxDistance,
+            minDistance
+          );
           const { enc, iv, key } = enction(apikeyR);
 
           const Datapush = {
             head: hea,
             code: cod,
             Data: Dataform,
-            lati: latitude,
-            long: longitude,
+            // lati: latitude,
+            // long: longitude,
+            lati: randomCoordinate.latitude,
+            long: randomCoordinate.longitude,
             footer: fot,
             ak: enc,
             iv: iv,
